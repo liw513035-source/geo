@@ -1,8 +1,6 @@
 @import "tailwindcss";
 
 body {
-  background: #f4f1ea;
-  color: #1c1915;
   font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
 }
 

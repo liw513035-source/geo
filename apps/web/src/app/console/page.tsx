@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { MarketingHeader } from "@/components/Shell";
 import { api } from "@/lib/api";
 
 type Model = { id: string; provider: string; model: string; enabled: boolean; priority: number; configured: boolean };
@@ -99,7 +100,9 @@ export default function ConsolePage() {
   }
 
   return (
-    <section>
+    <div className="min-h-screen bg-[#f7f8fb]">
+    <MarketingHeader />
+    <section className="mx-auto max-w-5xl px-4 py-8">
       <h1 className="text-2xl font-semibold">管理后台</h1>
       <div className="mt-4 flex flex-wrap gap-2 text-sm">
         {[
@@ -197,5 +200,6 @@ export default function ConsolePage() {
         </form>
       )}
     </section>
+    </div>
   );
 }

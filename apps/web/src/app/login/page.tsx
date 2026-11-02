@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { MarketingHeader } from "@/components/Shell";
 import { api } from "@/lib/api";
 
 export default function LoginPage() {
@@ -23,13 +24,16 @@ export default function LoginPage() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="mx-auto max-w-sm space-y-3">
-      <h1 className="text-2xl font-semibold">登录</h1>
-      <input className="w-full rounded-lg border bg-white px-3 py-2" placeholder="邮箱" value={email} onChange={(event) => setEmail(event.target.value)} />
-      <input className="w-full rounded-lg border bg-white px-3 py-2" placeholder="密码" type="password" value={password} onChange={(event) => setPassword(event.target.value)} />
-      {error && <p className="text-sm text-red-700">{error}</p>}
-      <button className="rounded-lg bg-stone-900 px-4 py-2 text-white">登录</button>
-      <p className="text-sm"><Link href="/register" className="underline">注册</Link></p>
-    </form>
+    <div className="min-h-screen bg-[#f7f8fb]">
+      <MarketingHeader />
+      <form onSubmit={onSubmit} className="mx-auto mt-16 max-w-md space-y-3 rounded-2xl border border-[#e8edf5] bg-white p-6">
+        <h1 className="text-2xl font-semibold text-[#0b1f44]">登录</h1>
+        <input className="h-11 w-full rounded-xl border border-[#e2e8f0] px-3" placeholder="邮箱" value={email} onChange={(event) => setEmail(event.target.value)} />
+        <input className="h-11 w-full rounded-xl border border-[#e2e8f0] px-3" placeholder="密码" type="password" value={password} onChange={(event) => setPassword(event.target.value)} />
+        {error && <p className="text-sm text-rose-600">{error}</p>}
+        <button className="h-11 w-full rounded-xl bg-[#2563eb] text-white">登录</button>
+        <p className="text-sm text-[#64748b]">没有账号？ <Link href="/register" className="text-[#2563eb]">注册</Link></p>
+      </form>
+    </div>
   );
 }

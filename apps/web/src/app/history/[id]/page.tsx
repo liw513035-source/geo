@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { AppFrame } from "@/components/Shell";
 import { ScoreView } from "@/components/ScoreView";
 import { api, type Score } from "@/lib/api";
 
@@ -14,15 +15,11 @@ export default function HistoryPage() {
       .then(setScore)
       .catch((caught) => setError(caught instanceof Error ? caught.message : "找不到记录"));
   }, [params.id]);
-  if (error) return <p>{error}</p>;
-  if (!score) return <p>正在读取记录</p>;
   return (
-    <div className="space-y-4">
-      <div className="flex gap-3 text-sm">
-        <a className="underline" href={`/api/v1/scores/${score.id}/export.md`}>下载 Markdown</a>
-        <a className="underline" href={`/api/v1/scores/${score.id}/export.pdf`}>下载 PDF</a>
-      </div>
-      <ScoreView score={score} />
-    </div>
+    <AppFrame active="history">
+      {error && <p className="text-sm text-rose-600">{error}</p>}
+      {!error && !score && <p className="text-sm text-[#64748b]">读取中</p>}
+      {score && <ScoreView score={score} exportable />}
+    </AppFrame>
   );
 }

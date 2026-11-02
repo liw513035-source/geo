@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { AppFrame } from "@/components/Shell";
 import { api } from "@/lib/api";
 
 type Me = { email: string; role: string; plan: string; quota: { limit: number | null; remaining: number | null; unlimited: boolean } };
@@ -40,33 +41,48 @@ export default function AccountPage() {
     location.href = "/";
   }
 
-  if (error) return <p>{error}。<Link className="underline" href="/login">去登录</Link></p>;
-  if (!me) return <p>正在读取账号</p>;
   return (
-    <section className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">会员中心</h1>
-        <p className="mt-2 text-sm text-stone-600">{me.email} · {subscription?.plan === "free" || !subscription ? "注册用户" : subscription.plan} · {me.quota.unlimited ? "不限次数" : `今日剩余 ${me.quota.remaining} 次`}</p>
-        {subscription?.current_period_end && <p className="mt-1 text-sm text-stone-500">有效期至 {subscription.current_period_end}</p>}
-        {subscription && subscription.plan !== "free" && !subscription.cancel_at_period_end && (
-          <button className="mt-2 text-sm underline" onClick={cancel}>到期后不续费</button>
-        )}
-        {notice && <p className="mt-2 text-sm text-stone-600">{notice}</p>}
-        <div className="mt-3 flex gap-3 text-sm">
-          <Link className="underline" href="/pricing">升级</Link>
-          {me.role === "admin" && <Link className="underline" href="/console">管理后台</Link>}
-          <button className="underline" onClick={logout}>退出</button>
-        </div>
-      </div>
-      <ul className="space-y-2">
-        {items.length === 0 && <li className="text-sm text-stone-500">还没有历史记录。</li>}
-        {items.map((item) => (
-          <li key={item.id} className="rounded-lg bg-white px-3 py-2 text-sm">
-            <Link href={`/history/${item.id}`} className="font-medium">{item.score} 分</Link>
-            <span className="ml-2 break-all text-stone-500">{item.url}</span>
-          </li>
-        ))}
-      </ul>
-    </section>
+    <AppFrame active="history">
+      {error && <p className="text-sm text-rose-600">{error} <Link className="underline" href="/login">登录</Link></p>}
+      {!error && !me && <p className="text-sm text-[#64748b]">读取中</p>}
+      {me && (
+        <section className="space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h1 className="text-xl font-semibold text-[#0b1f44]">历史记录</h1>
+              <p className="mt-1 text-sm text-[#64748b]">{me.email} · {me.quota.unlimited ? "不限次数" : `剩余 ${me.quota.remaining} 次`}</p>
+            </div>
+            <div className="flex gap-3 text-sm">
+              {me.role === "admin" && <Link className="text-[#2563eb]" href="/console">后台</Link>}
+              <button className="text-[#64748b]" onClick={logout}>退出</button>
+            </div>
+          </div>
+          {subscription && subscription.plan !== "free" && (
+            <p className="text-sm text-[#64748b]">
+              {subscription.plan} {subscription.current_period_end ? `· ${subscription.current_period_end}` : ""}
+              {!subscription.cancel_at_period_end && <button className="ml-3 text-[#2563eb]" onClick={cancel}>不续费</button>}
+            </p>
+          )}
+          {notice && <p className="text-sm text-[#64748b]">{notice}</p>}
+          <ul className="overflow-hidden rounded-2xl border border-[#e8edf5] bg-white">
+            {items.length === 0 && <li className="px-4 py-6 text-sm text-[#94a3b8]">暂无记录</li>}
+            {items.map((item) => (
+              <li key={item.id} className="flex items-center justify-between gap-3 border-t border-[#f1f5f9] px-4 py-3 text-sm first:border-t-0">
+                <Link href={`/history/${item.id}`} className="truncate text-[#0f172a]">{safeHost(item.url)}</Link>
+                <span className="shrink-0 font-semibold text-[#2563eb]">{item.score}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </AppFrame>
   );
+}
+
+function safeHost(raw: string) {
+  try {
+    return new URL(raw).hostname + new URL(raw).pathname;
+  } catch {
+    return raw;
+  }
 }
