@@ -12,6 +12,8 @@ type Plan = {
   features: string[];
 };
 
+type Payments = { wechat: boolean; alipay: boolean };
+
 const featureText: Record<string, string> = {
   unlimited_score: "不限评分次数",
   batch: "批量处理（未开放）",
@@ -21,10 +23,16 @@ const featureText: Record<string, string> = {
 
 export default function PricingPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
+  const [payments, setPayments] = useState<Payments>({ wechat: false, alipay: false });
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    api<{ items: Plan[] }>("/api/v1/plans").then((data) => setPlans(data.items)).catch(() => setMessage("暂时无法读取计划"));
+    api<{ items: Plan[]; payments: Payments }>("/api/v1/plans")
+      .then((data) => {
+        setPlans(data.items);
+        setPayments(data.payments);
+      })
+      .catch(() => setMessage("暂时无法读取计划"));
   }, []);
 
   async function pay(code: string, provider: "wechat" | "alipay") {
@@ -49,9 +57,10 @@ export default function PricingPage() {
               {plan.features.map((feature) => <li key={feature}>{featureText[feature] || feature}</li>)}
             </ul>
             <div className="mt-4 flex gap-2">
-              <button className="rounded-lg bg-stone-900 px-3 py-2 text-sm text-white" onClick={() => pay(plan.code, "wechat")}>微信支付</button>
-              <button className="rounded-lg border px-3 py-2 text-sm" onClick={() => pay(plan.code, "alipay")}>支付宝</button>
+              <button disabled={!payments.wechat} className="rounded-lg bg-stone-900 px-3 py-2 text-sm text-white disabled:opacity-40" onClick={() => pay(plan.code, "wechat")}>微信支付</button>
+              <button disabled={!payments.alipay} className="rounded-lg border px-3 py-2 text-sm disabled:opacity-40" onClick={() => pay(plan.code, "alipay")}>支付宝</button>
             </div>
+            {(!payments.wechat || !payments.alipay) && <p className="mt-2 text-xs text-stone-500">未配置的支付方式不可用。</p>}
           </article>
         ))}
       </div>

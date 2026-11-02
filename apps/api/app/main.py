@@ -310,7 +310,13 @@ def plans():
             FROM t_plans WHERE enabled = TRUE ORDER BY price
             """
         ).fetchall()
-    return {"items": [_plan_view(row) for row in rows]}
+    return {
+        "items": [_plan_view(row) for row in rows],
+        "payments": {
+            "wechat": payment_ready("wechat", settings),
+            "alipay": payment_ready("alipay", settings),
+        },
+    }
 
 
 @app.get("/api/v1/subscription")
